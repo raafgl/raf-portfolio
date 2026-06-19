@@ -1,13 +1,479 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>.raf / branding, interface & print</title>
+    <!-- CSS imports -->
+    <link rel="stylesheet" href="/src/style.css" />
+    <!-- Tailwind CSS modern production browser runtime CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                surface: '#191919',
+                'surface-card': '#242424',
+                orange: '#D93300',
+                'orange-hover': '#BF2D00',
+                'orange-light': '#FCFCE8',
+                secondary: '#FCFCE8',
+                text: '#FCFCE8',
+                'text-muted': '#A3A395',
+                outline: '#D93300'
+              }
+            },
+            fontFamily: {
+              sans: ['"Space Grotesk"', 'Inter', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'monospace']
+            }
+          }
+        }
+      }
+    </script>
+    <!-- Lucide icons package CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
   </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body class="min-h-screen relative overflow-hidden bg-brand-surface text-brand-text flex flex-col justify-between selection:bg-brand-orange selection:text-brand-orange-light scanlines" id="body-root">
+
+    <!-- Interactive Top Console Controls & Navigation -->
+    <nav class="fixed top-0 left-0 w-full bg-transparent flex justify-between items-center px-6 md:px-12 py-6 font-mono text-xs z-50 text-white mix-blend-difference">
+      
+      <!-- Brand Logo / Scroll to Welcome -->
+      <button 
+        onclick="scrollToSegment(0)"
+        class="scale-95 transition-all hover:scale-100 text-left h-8 flex items-center justify-start cursor-pointer bg-transparent border-0"
+        id="branding-logo"
+      >
+        <img 
+          src="/raf-logo.png" 
+          alt="raf-logo" 
+          class="h-[18px] md:h-[24px] w-auto object-contain block" 
+          onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='inline-block';"
+        />
+        <span id="logo-fallback" class="hidden font-sans font-black text-lg md:text-xl tracking-tighter text-brand-orange">.raf</span>
+      </button>
+
+      <!-- Central Quick Nav anchors (Desktop) -->
+      <div class="hidden md:flex justify-between items-center space-x-8 max-w-2xl">
+        <button 
+          onclick="scrollToSegment(1)" 
+          id="nav-branding"
+          class="nav-anchor transition-colors py-1 lowercase cursor-pointer bg-transparent border-0 text-zinc-400 hover:text-white"
+        >
+          .branding
+        </button>
+        <button 
+          onclick="scrollToSegment(2)" 
+          id="nav-interface"
+          class="nav-anchor transition-colors py-1 lowercase cursor-pointer bg-transparent border-0 text-zinc-400 hover:text-white"
+        >
+          .interface
+        </button>
+        <button 
+          onclick="scrollToSegment(3)" 
+          id="nav-print"
+          class="nav-anchor transition-colors py-1 lowercase cursor-pointer bg-transparent border-0 text-zinc-400 hover:text-white"
+        >
+          .print
+        </button>
+        <button 
+          onclick="scrollToSegment(4)" 
+          id="nav-worked-for"
+          class="nav-anchor transition-colors py-1 lowercase cursor-pointer bg-transparent border-0 text-zinc-400 hover:text-white"
+        >
+          .worked for
+        </button>
+      </div>
+
+      <!-- Live Interface Status & Controls toggles -->
+      <div class="flex items-center space-x-4 font-mono text-[10px] tracking-wider">
+        <!-- CRT toggle standard utility -->
+        <button 
+          onclick="toggleScanlines()" 
+          id="scanlines-toggle"
+          class="px-2 py-0.5 border border-white/20 hover:border-brand-orange hover:text-brand-orange text-zinc-400 font-mono text-[10px] rounded transition-all cursor-pointer inline-flex items-center gap-1 bg-black/40"
+          title="Toggle CRT Grid Scanlines"
+        >
+          <i data-lucide="tv" class="w-3 h-3"></i> CRT
+        </button>
+
+        <!-- Sound switch -->
+        <button 
+          onclick="toggleSound()" 
+          id="sound-toggle"
+          class="px-2 py-0.5 border border-white/20 hover:border-brand-orange hover:text-brand-orange text-zinc-400 font-mono text-[10px] rounded transition-all cursor-pointer inline-flex items-center gap-1 bg-black/40"
+          title="Toggle Sound Effects Feedback"
+        >
+          <i data-lucide="volume-2" class="w-3 h-3 text-brand-orange" id="sound-icon"></i> sound
+        </button>
+      </div>
+    </nav>
+
+    <!-- Ambient backdrop overlay -->
+    <div class="fixed inset-0 z-[-1] pointer-events-none">
+      <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/80 to-[#131313]/95"></div>
+    </div>
+
+    <!-- Primary Vertical Scroll Snap container -->
+    <main id="scroll-container" class="scroll-container z-10 w-full">
+      
+      <!-- SECTION 1: .welcome -->
+      <section class="scroll-section px-[5vw]">
+        <!-- Tokyo atmospheric backdrop picture -->
+        <div 
+          class="section-bg absolute inset-0 pointer-events-none -z-10 bg-cover bg-center opacity-80" 
+          style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDwfUY_00Hylj7Y6Asv5HUSgAHuo_jwWHn0EaulumQ63Otb5ckywi7cVNSkAaWXYnZ-zMMtOfoNquGyAvnZ6b-AS7HWLEw7-MVoSIpkwp2CeP6FeNbWLcmJdSrrrUvhwGn1fjNaSB0wttv82gM8TEANuGjnCW6Yia6-HTneGrgaUtLYclMEVToS8rfXGiIbgYs3w2n6qZjFwcQj52KdXLRqaOxtRpR05EqkrlK2NNwXzxZZcIy79cpKmTV_pUAwnzMF-dsK8dc-pZk')"
+        ></div>
+        
+        <div class="max-w-4xl pb-16 animate-fade-in-up">
+          <h1 class="font-sans text-5xl md:text-8xl font-black mb-4 lowercase tracking-tight leading-none text-brand-text">
+            .hi, i'm raf
+          </h1>
+          <p class="font-sans text-sm md:text-base text-brand-text-muted max-w-xl lowercase leading-relaxed">
+            spain-based graphic designer with +10 years of experience. worked in advertising for +3 years with both national and international clients.
+          </p>
+        </div>
+      </section>
+
+      <!-- SECTION 2: .branding design -->
+      <section class="scroll-section px-[5vw]">
+        <!-- Branding abstract geometry backdrop -->
+        <div 
+          class="section-bg absolute inset-0 pointer-events-none -z-10 bg-cover bg-center" 
+          style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDPR2ceREfrUqOiDOWxvdgBY-t-kaK7N015t8BbT3golrdXt4BPitzPuDmc24DL9GgOUSHBDEl8IH1n-hxg5JNPEYfXiFMr0jxriNoxsKk2AxCJ-Aqnpq_T6AzIHkiHMRvRIZIDhNhL3epqUljB7x6A-VA7LhRBhd8N1O1n4irO11LVBQ2ZD8Z46z5kM--2wQwLGTaXgrTGjB04DwviFZ-pVi8cBzPt02Tuf65MdTUql_WEXneClCGUIRe-Xz8wJk-B5AeqaYJNVdk')"
+        ></div>
+
+        <div class="max-w-4xl pb-16 w-full">
+          <h1 class="font-sans text-4xl md:text-7xl font-black mb-6 lowercase tracking-tight text-brand-text">
+            .branding design <span class="text-brand-orange">/</span>
+          </h1>
+          
+          <!-- Projects insertion point (rendered via JS) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2" id="branding-grid">
+            <!-- Dynamic Category cards go here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: .interface design -->
+      <section class="scroll-section px-[5vw]">
+        <!-- Archaeological UI layout backdrop -->
+        <div 
+          class="section-bg absolute inset-0 pointer-events-none -z-10 bg-cover bg-center" 
+          style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCjQlGjlj6wqxyQsjIfUz2O88Nlm9hbdwwL95uckVFs40DJd_eZQj9k5JPpLDNfxWHk1GhYM2QrKV2ETWMbuSK6w8txcHcVviWYz-1JzCckJIHykbb1Ytw9yacHO8Ly73ABmRwf8nkh0bHiS48h6MVhMbZLPAmNJx31VygP2RD41mFF7H0TPyWMiIhmFVtCBgMNpptGK8eSilAbzBhHjMVgBu5RkEW6AwWqjRuysAdIiVqthwvJklrq5vODUYhu0eXBbJR8LINc_2o')"
+        ></div>
+
+        <div class="max-w-4xl pb-16 w-full">
+          <h1 class="font-sans text-4xl md:text-7xl font-black mb-6 lowercase tracking-tight text-brand-text">
+            .interface design <span class="text-brand-orange">/</span>
+          </h1>
+
+          <!-- Interface grid insertion point -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2" id="interface-grid">
+            <!-- Dynamic interface files cards go here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: .print design -->
+      <section class="scroll-section px-[5vw]">
+        <!-- Concrete print tactile backdrop -->
+        <div 
+          class="section-bg absolute inset-0 pointer-events-none -z-10 bg-cover bg-center" 
+          style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAaByw4CHO7rq-4v0cLqhiQnlH7Sv5Qk0Oef8lEhiL0l4lgt1XIVg5F7lQPu8ABK6Rvh2AzQJizwxngjn-iMgjp11byFyLw0OzCylXbZbCS6_nx8TfTwJp_W9QW7PCDu2ios8oma5VNGg2bJW4C96O4Y1RRh1R2Ypnjp3J2pA502GgTwFatZjufNZjbodhvb4PMLsv1M0uPjf1vxlZ2JjxCw-z4_KDfcvHH8BZ_PGb3rwxnEnVQIJ_EC_YYpfzJcPcEy9qb1APXjz0')"
+        ></div>
+
+        <div class="max-w-4xl pb-16 w-full">
+          <h1 class="font-sans text-4xl md:text-7xl font-black mb-6 lowercase tracking-tight text-brand-text">
+            .print design <span class="text-brand-orange">/</span>
+          </h1>
+
+          <!-- Print grid insertion point -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2" id="print-grid">
+            <!-- Dynamic physical print layout goes here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 5: .worked for -->
+      <section class="scroll-section px-[5vw]">
+        <div class="w-full max-w-6xl pb-24 grid grid-cols-1 lg:grid-cols-5 gap-8 items-end">
+          <div class="lg:col-span-2">
+            <h1 class="font-sans text-5xl md:text-8xl font-black lowercase tracking-tight text-brand-text leading-none">
+              .worked for
+            </h1>
+          </div>
+
+          <!-- Worked for brands insertion point -->
+          <div class="lg:col-span-3 grid grid-cols-2 gap-x-12 gap-y-3 font-sans text-sm md:text-base text-brand-text-muted lowercase" id="worked-for-grid">
+            <!-- Dynamic brand names list goes here -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Persistent Orange Footer conforming precisely to specs -->
+    <footer class="fixed bottom-0 left-0 w-full bg-brand-orange flex justify-between items-center px-6 md:px-[5vw] py-4 z-40 text-brand-orange-light font-sans text-xs">
+      <button
+        onclick="openResumeModal()"
+        class="font-sans text-2xl font-black text-brand-orange-light opacity-80 hover:opacity-100 transition-opacity bg-transparent border-0 cursor-pointer"
+        title="See designer credentials"
+      >
+        ®
+      </button>
+
+      <!-- Footer action options -->
+      <div class="flex justify-end space-x-6 md:space-x-12 font-mono text-[11px] lowercase tracking-wider">
+        <a 
+          href="mailto:hello@raf.design"
+          onclick="playTick()"
+          class="hover:text-white transition-colors duration-300 scale-95 hover:scale-100 lowercase"
+        >
+          .mail
+        </a>
+        <button 
+          onclick="openResumeModal()"
+          class="hover:text-white transition-colors duration-300 scale-95 hover:scale-100 lowercase cursor-pointer bg-transparent border-0 font-mono"
+        >
+          .curriculum
+        </button>
+        <a 
+          href="#"
+          id="behance-link"
+          class="hover:text-white transition-colors duration-300 scale-95 hover:scale-100 lowercase flex items-center gap-1"
+        >
+          .behance
+        </a>
+      </div>
+    </footer>
+
+    <!-- Screen Pagination Indicator active bar on the right extreme -->
+    <div class="fixed right-6 top-[25vh] w-[3px] h-[50vh] bg-white/5 z-50 rounded-full overflow-hidden">
+      <div 
+        id="scroll-indicator"
+        class="bg-brand-orange w-full rounded-full transition-all duration-75"
+        style="height: 20%; transform: translateY(0%);"
+      ></div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- INTERACTIVE CASE STUDY PROJECT DETAIL MODAL -->
+    <!-- ========================================== -->
+    <div id="project-modal" class="fixed inset-0 z-50 flex items-center justify-end bg-black/80 backdrop-blur-sm p-4 overflow-y-auto hidden">
+      <!-- Modal Inner Container -->
+      <div class="relative w-full max-w-2xl bg-brand-surface-card border border-brand-outline/20 p-6 md:p-8 rounded shadow-2xl h-full flex flex-col justify-between overflow-y-auto transform translate-x-full transition-transform duration-500" id="project-modal-content">
+        <div>
+          <!-- Header -->
+          <div class="flex justify-between items-center border-b border-brand-outline/10 pb-4 mb-6">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="folder-kanban" class="w-5 h-5 text-brand-orange"></i>
+              <span class="font-mono text-xs uppercase tracking-wider text-brand-text-muted" id="modal-project-category">
+                case study / BRANDING
+              </span>
+            </div>
+            <button
+              onclick="closeProjectModal()"
+              class="p-2 border border-brand-outline/20 hover:border-brand-orange hover:text-brand-orange transition-colors rounded-sm bg-transparent"
+              title="Close Panel"
+            >
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- Project Title -->
+          <h2 class="font-sans text-4xl md:text-5xl font-extrabold tracking-tight text-brand-text lowercase mb-2">
+            <span id="modal-project-title">project title</span> <span class="text-brand-orange">/</span>
+          </h2>
+          <p class="font-sans text-lg text-brand-orange font-medium mb-6" id="modal-project-subtitle">
+            branding, identity design and guidelines
+          </p>
+
+          <!-- Hero Image -->
+          <div class="relative aspect-video w-full overflow-hidden border border-brand-outline/10 mb-6 rounded-sm group bg-black">
+            <img
+              id="modal-project-image"
+              src=""
+              alt=""
+              referrerpolicy="no-referrer"
+              class="w-full h-full object-cover transition-all duration-700 filter grayscale hover:grayscale-0 scale-100 hover:scale-105"
+            />
+            <div class="absolute top-2 right-2 bg-brand-surface px-2.5 py-1 text-[11px] font-mono uppercase tracking-wider border border-brand-outline/30 rounded-sm pointer-events-none">
+              active preview
+            </div>
+          </div>
+
+          <!-- Overview & stats -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="md:col-span-2">
+              <h3 class="font-mono text-xs uppercase text-brand-orange mb-2 tracking-wider">.the overview</h3>
+              <p class="font-sans text-brand-text-muted text-sm leading-relaxed lowercase" id="modal-project-desc">
+                full comprehensive overview
+              </p>
+            </div>
+            <div class="space-y-4">
+              <div>
+                <h4 class="font-mono text-xs uppercase text-brand-orange tracking-wider flex items-center gap-1">
+                  <i data-lucide="calendar" class="w-3.5 h-3.5"></i> .timeline
+                </h4>
+                <p class="font-sans text-brand-text text-sm lowercase" id="modal-project-year">2025 / completed</p>
+              </div>
+              <div>
+                <h4 class="font-mono text-xs uppercase text-brand-orange tracking-wider flex items-center gap-1">
+                  <i data-lucide="wrench" class="w-3.5 h-3.5"></i> .toolkit
+                </h4>
+                <div class="flex flex-wrap gap-1 mt-1" id="modal-project-toolkit">
+                  <!-- Tools pill tags go here -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Deliverables checklist list -->
+          <div class="border-t border-brand-outline/10 pt-6 mb-6">
+            <h3 class="font-mono text-xs uppercase text-brand-orange tracking-wider mb-4 flex items-center gap-1">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> .designed deliverables
+            </h3>
+            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="modal-project-features">
+              <!-- Feature list elements list -->
+            </ul>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="border-t border-brand-outline/10 pt-6 mt-8 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+          <div class="font-mono text-[10px] text-brand-text-muted/60 lowercase">
+            ® 2026. all digital files secure.
+          </div>
+          <button
+            onclick="closeProjectModal()"
+            class="px-6 py-2 bg-brand-orange hover:bg-brand-orange-hover text-brand-orange-light font-sans text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors text-center cursor-pointer border-0"
+          >
+            .close publication view
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- INTERACTIVE CURRICULUM VITÆ RESUME MODAL   -->
+    <!-- ========================================== -->
+    <div id="resume-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 overflow-y-auto hidden">
+      <!-- Modal card popup -->
+      <div class="relative w-full max-w-4xl bg-brand-surface-card border border-brand-outline/20 p-6 md:p-8 rounded shadow-2xl overflow-y-auto max-h-[90vh] scale-95 transition-all duration-300" id="resume-modal-content">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b border-brand-outline/10 pb-4 mb-6">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="award" class="w-5 h-5 text-brand-orange"></i>
+            <span class="font-mono text-xs uppercase tracking-wider text-brand-text-muted">
+              designer credential .curriculum vital
+            </span>
+          </div>
+          <button
+            onclick="closeResumeModal()"
+            class="p-2 border border-brand-outline/20 hover:border-brand-orange hover:text-brand-orange transition-colors rounded-sm bg-transparent"
+            title="Close Panel"
+          >
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- CV content bento layout grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 text-left">
+          
+          <!-- Column 1: Info and Mastered Modules -->
+          <div class="space-y-6">
+            <div class="p-4 bg-brand-surface border border-brand-outline/10 rounded-sm">
+              <h3 class="font-sans text-xl font-bold text-brand-text mb-1 lowercase">raf .</h3>
+              <p class="font-mono text-xs text-brand-text-muted mb-4 font-semibold uppercase">senior graphic & visual media designer</p>
+              
+              <div class="space-y-2 border-t border-brand-outline/10 pt-4 text-xs text-brand-text-muted font-sans lowercase">
+                <div class="flex justify-between">
+                  <span class="font-mono text-brand-orange text-[10px]">location:</span>
+                  <span>valencia, spain</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-mono text-brand-orange text-[10px]">experience:</span>
+                  <span>10+ years (self-taught focus)</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-mono text-brand-orange text-[10px]">availability:</span>
+                  <span class="text-emerald-400">● immediate commissions</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Skills matrices lists -->
+            <div>
+              <h3 class="font-mono text-xs uppercase text-brand-orange tracking-wider mb-3 flex items-center gap-1">
+                <i data-lucide="layers" class="w-3.5 h-3.5"></i> .mastered matrices
+              </h3>
+              <div class="space-y-4" id="skills-matrices">
+                <!-- Skill groups filled dynamically via javascript -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Columns 2-3: CV Ledger Timeline with Tabs -->
+          <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Filters Tabs row controls -->
+            <div class="flex flex-wrap items-center gap-2 border-b border-brand-outline/10 pb-4">
+              <span class="font-mono text-xs text-brand-text-muted/60 uppercase mr-2">filter ledger:</span>
+              <button 
+                onclick="filterLedger('all')" 
+                id="filter-all"
+                class="cv-tab-btn px-3 py-1 text-xs font-mono lowercase border transition-all rounded-sm bg-brand-orange border-brand-orange text-brand-orange-light"
+              >
+                .all
+              </button>
+              <button 
+                onclick="filterLedger('experience')" 
+                id="filter-experience"
+                class="cv-tab-btn px-3 py-1 text-xs font-mono lowercase border transition-all rounded-sm border-brand-outline/20 hover:border-brand-orange text-brand-text-muted"
+              >
+                .experience
+              </button>
+              <button 
+                onclick="filterLedger('education')" 
+                id="filter-education"
+                class="cv-tab-btn px-3 py-1 text-xs font-mono lowercase border transition-all rounded-sm border-brand-outline/20 hover:border-brand-orange text-brand-text-muted"
+              >
+                .education
+              </button>
+            </div>
+
+            <!-- Scrollable Timeline listing -->
+            <div class="space-y-6 overflow-y-auto max-h-[45vh] pr-2 scrollbar-thin" id="timeline-list">
+              <!-- Timeline Items lists built dynamically -->
+            </div>
+
+            <!-- CV Footer elements -->
+            <div class="border-t border-brand-outline/10 pt-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+              <div class="flex items-center gap-2 text-xs font-mono text-brand-text-muted/70">
+                <i data-lucide="graduation-cap" class="h-4 w-4 text-brand-orange"></i>
+                <span>accredited curriculum format active.</span>
+              </div>
+              <button
+                onclick="downloadPDF()"
+                class="flex items-center gap-2 px-4 py-2 border border-brand-orange hover:bg-brand-orange/10 text-brand-orange font-sans text-xs font-semibold uppercase tracking-wider rounded-sm cursor-pointer transition-all bg-transparent"
+              >
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> .download printed dossier [pdf]
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Core Javascript files -->
+    <script type="module" src="/src/script.js"></script>
   </body>
 </html>
-

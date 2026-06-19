@@ -1,6 +1,4 @@
-import { Project, BrandPartner, CVItem } from './types';
-
-export const PROJECTS: Project[] = [
+export const PROJECTS = [
   {
     id: 'torii-manga',
     category: 'branding',
@@ -105,7 +103,7 @@ export const PROJECTS: Project[] = [
   }
 ];
 
-export const BRAND_PARTNERS: BrandPartner[] = [
+export const BRAND_PARTNERS = [
   {
     id: 'nintendo-es',
     name: 'Nintendo España',
@@ -140,7 +138,7 @@ export const BRAND_PARTNERS: BrandPartner[] = [
   }
 ];
 
-export const CV_ITEMS: CVItem[] = [
+export const CV_ITEMS = [
   {
     id: 'exp-1',
     type: 'experience',
@@ -183,7 +181,7 @@ export const CV_ITEMS: CVItem[] = [
   }
 ];
 
-export const WORKED_FOR_BRANDS: string[] = [
+export const WORKED_FOR_BRANDS = [
   '.aenor', '.airbus', '.amadeus', '.ayesa', '.bp', '.caja rural', '.cáritas', 
   '.castellana properties', '.cruz roja', '.dunkin', '.edwards', '.ericsson', 
   '.estrella galicia', '.fifa', '.firststop', '.gestamp', '.habanos', '.indra', 
