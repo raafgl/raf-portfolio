@@ -539,6 +539,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const updateCvDownloadAttribute = () => {
     const cvLink = document.querySelector('a[data-i18n="footer.curriculum"]');
     if (cvLink) {
+      // Resolve to fully qualified absolute URL so that opening in target="_blank"
+      // works properly even inside nested/sandboxed iframes (e.g., on Android Chrome).
+      cvLink.href = new URL('Rafael_Guerra_Lazaro_CV.pdf', window.location.href).href;
+
       const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
       if (isMobile) {
         cvLink.removeAttribute('download');
