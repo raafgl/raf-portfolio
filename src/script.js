@@ -173,7 +173,8 @@ window.scrollToSegment = function(index) {
   const sections = document.querySelectorAll('.scroll-section');
   if (index < 0 || index >= sections.length) return;
   
-  const targetY = index * container.clientHeight;
+  const sectionHeight = sections[0] ? sections[0].clientHeight : container.clientHeight;
+  const targetY = index * sectionHeight;
   const startY = container.scrollTop;
   const distance = targetY - startY;
   
@@ -215,7 +216,9 @@ const handleScrollTracker = () => {
   if (!container) return;
   
   const scrollY = container.scrollTop;
-  const height = window.innerHeight;
+  // Use the stable section height for index calculation, falling back to window.innerHeight
+  const firstSection = container.querySelector('.scroll-section');
+  const height = firstSection ? firstSection.clientHeight : window.innerHeight;
   const index = Math.round(scrollY / height);
   
   const segments = ['welcome', 'branding', 'interface', 'print', 'worked-for'];
@@ -502,6 +505,34 @@ const initHeroTitleSlider = () => {
 
 // Main setup initialization block
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Mobile Chrome Viewport Fix ---
+  // Ensure the section height does not change during scroll when the address bar hides.
+  const setStableViewportHeight = () => {
+    const vh = window.innerHeight;
+    document.documentElement.style.setProperty('--stable-vh', `${vh}px`);
+  };
+  
+  // Set initially
+  setStableViewportHeight();
+  
+  // Update only on width change (orientation change) for mobile to avoid recalculating on vertical scroll
+  let lastWidth = window.innerWidth;
+  window.addEventListener('resize', () => {
+    const currentWidth = window.innerWidth;
+    const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    
+    if (isMobile) {
+      if (currentWidth !== lastWidth) {
+        lastWidth = currentWidth;
+        setStableViewportHeight();
+      }
+    } else {
+      // On desktop, update on any resize to keep layout responsive
+      setStableViewportHeight();
+    }
+  });
+  // ----------------------------------
+
   const initLang = localStorage.getItem('portfolio_lang') || 'en';
   window.changeLanguage(initLang);
   initHeroTitleSlider();
@@ -522,7 +553,9 @@ document.addEventListener('DOMContentLoaded', () => {
       isWheeling = true;
       
       const direction = Math.sign(e.deltaY);
-      const currentIndex = Math.round(container.scrollTop / container.clientHeight);
+      const firstSection = container.querySelector('.scroll-section');
+      const sectionHeight = firstSection ? firstSection.clientHeight : container.clientHeight;
+      const currentIndex = Math.round(container.scrollTop / sectionHeight);
       const sections = document.querySelectorAll('.scroll-section');
       const nextIndex = Math.max(0, Math.min(currentIndex + direction, sections.length - 1));
       

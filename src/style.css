@@ -42,7 +42,9 @@ body {
 }
 
 .scroll-section {
-  height: 100%;
+  height: 100vh; /* fallback */
+  height: 100dvh; /* fallback */
+  height: var(--stable-vh, 100dvh); /* Mobile Chrome fix */
   width: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
