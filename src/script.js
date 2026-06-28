@@ -165,26 +165,57 @@ export function playHover() {}
 window.playTick = playTick;
 window.playHover = playHover;
 
-// Scroll to segment index logic using scrollIntoView
+// Scroll to segment index logic with premium requestAnimationFrame easing
 window.scrollToSegment = function(index) {
+  const container = document.getElementById('scroll-container');
+  if (!container) return;
+  
   const sections = document.querySelectorAll('.scroll-section');
   if (index < 0 || index >= sections.length) return;
   
-  const targetSection = sections[index];
-  if (targetSection) {
-    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  const targetY = index * container.clientHeight;
+  const startY = container.scrollTop;
+  const distance = targetY - startY;
+  
+  // Skip if already at target
+  if (Math.abs(distance) < 5) return;
+  
+  const duration = 400; // Smooth premium duration
+  let start = null;
+
+  // Premium easing: easeInOutQuart
+  const easing = (t) => t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
+
+  // Temporarily disable CSS snap to prevent conflicts during JS animation
+  container.style.scrollSnapType = 'none';
+
+  const step = (timestamp) => {
+    if (!start) start = timestamp;
+    const progress = Math.min((timestamp - start) / duration, 1);
+    
+    container.scrollTo({
+      top: startY + distance * easing(progress),
+      behavior: 'auto'
+    });
+
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    } else {
+      // Re-enable snap after transition completes
+      container.style.scrollSnapType = 'y mandatory';
+    }
+  };
+
+  window.requestAnimationFrame(step);
 };
 
 // Scroll listener handler for active navigation highlighting and vertical tracking
-let scrollEndTimeout;
 const handleScrollTracker = () => {
   const container = document.getElementById('scroll-container');
   if (!container) return;
   
   const scrollY = container.scrollTop;
-  // Use clientHeight instead of innerHeight to be safe with address bar
-  const height = container.clientHeight;
+  const height = window.innerHeight;
   const index = Math.round(scrollY / height);
   
   const segments = ['welcome', 'branding', 'interface', 'print', 'worked-for'];
@@ -202,29 +233,6 @@ const handleScrollTracker = () => {
   const indicator = document.getElementById('scroll-indicator');
   if (indicator) {
     indicator.style.transform = `translateY(${ (percent / 100) * 400 }%)`;
-  }
-
-  // Post-gesture section alignment for mobile (hybrid model)
-  if (window.innerWidth <= 768) {
-    clearTimeout(scrollEndTimeout);
-    scrollEndTimeout = setTimeout(() => {
-      const sections = document.querySelectorAll('.scroll-section');
-      
-      let closestSection = sections[0];
-      let minDistance = Infinity;
-      
-      sections.forEach(section => {
-        const distance = Math.abs(section.offsetTop - container.scrollTop);
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestSection = section;
-        }
-      });
-      
-      if (minDistance > 5) {
-        closestSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 150);
   }
 };
 
