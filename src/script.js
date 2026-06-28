@@ -166,6 +166,7 @@ window.playTick = playTick;
 window.playHover = playHover;
 
 // Scroll to segment index logic with premium requestAnimationFrame easing
+window.isScrollingToSegment = false;
 window.scrollToSegment = function(index) {
   const container = document.getElementById('scroll-container');
   if (!container) return;
@@ -180,6 +181,8 @@ window.scrollToSegment = function(index) {
   
   // Skip if already at target
   if (Math.abs(distance) < 5) return;
+  
+  window.isScrollingToSegment = true;
   
   const duration = 400; // Smooth premium duration
   let start = null;
@@ -204,21 +207,53 @@ window.scrollToSegment = function(index) {
     } else {
       // Re-enable snap after transition completes
       container.style.removeProperty('scroll-snap-type');
+      setTimeout(() => {
+        window.isScrollingToSegment = false;
+        
+        // Update indicators once after scroll completes (especially important for mobile)
+        window.isUpdatingFromScrollEnd = true;
+        handleScrollTracker();
+        window.isUpdatingFromScrollEnd = false;
+      }, 50);
     }
   };
 
   window.requestAnimationFrame(step);
 };
 
+// Cached dimensions to prevent layout recalculation during scroll
+let cachedSectionHeight = 0;
+let cachedMaxScroll = 0;
+
+export const updateCachedDimensions = () => {
+  const container = document.getElementById('scroll-container');
+  const firstSection = container?.querySelector('.scroll-section');
+  if (container && firstSection) {
+    cachedSectionHeight = firstSection.clientHeight || window.innerHeight;
+    cachedMaxScroll = container.scrollHeight - container.clientHeight;
+  }
+};
+
+window.addEventListener('resize', () => {
+  updateCachedDimensions();
+});
+
 // Scroll listener handler for active navigation highlighting and vertical tracking
 const handleScrollTracker = () => {
   const container = document.getElementById('scroll-container');
   if (!container) return;
   
+  // Strict rule: "No logic should execute during scroll movement" on mobile
+  const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  if (isMobile && !window.isUpdatingFromScrollEnd) {
+    return;
+  }
+  
   const scrollY = container.scrollTop;
-  // Use the stable section height for index calculation, falling back to window.innerHeight
-  const firstSection = container.querySelector('.scroll-section');
-  const height = firstSection ? firstSection.clientHeight : window.innerHeight;
+  
+  // Use cached values to avoid recalculation during scroll
+  if (cachedSectionHeight === 0) updateCachedDimensions();
+  const height = cachedSectionHeight || window.innerHeight;
   const index = Math.round(scrollY / height);
   
   const segments = ['welcome', 'branding', 'interface', 'print', 'worked-for'];
@@ -229,7 +264,7 @@ const handleScrollTracker = () => {
     updateNavigationHighlight();
   }
 
-  const maxScroll = container.scrollHeight - container.clientHeight;
+  const maxScroll = cachedMaxScroll;
   const percent = maxScroll > 0 ? (scrollY / maxScroll) * 100 : 0;
   
   // Update indicator vertical bar translate height
@@ -590,9 +625,31 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   if (container) {
+    let scrollTimeout;
     container.addEventListener('scroll', () => {
-      if (lastMouseX !== -999) {
+      // Disable continuous tracking during scroll for mobile to fix double jump
+      const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+      if (!isMobile && lastMouseX !== -999) {
         updateSpotlights(lastMouseX, lastMouseY);
+      }
+
+      // Mobile scroll-end snap correction
+      if (isMobile && !window.isScrollingToSegment) {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          window.isUpdatingFromScrollEnd = true;
+          handleScrollTracker(); // Update indicators once at the end
+          window.isUpdatingFromScrollEnd = false;
+          
+          const firstSection = container.querySelector('.scroll-section');
+          const sectionHeight = firstSection ? firstSection.clientHeight : container.clientHeight;
+          const currentIndex = Math.round(container.scrollTop / sectionHeight);
+          
+          const targetY = currentIndex * sectionHeight;
+          if (Math.abs(container.scrollTop - targetY) > 5) {
+            window.scrollToSegment(currentIndex);
+          }
+        }, 150);
       }
     }, { passive: true });
   }

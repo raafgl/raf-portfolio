@@ -37,6 +37,13 @@ body {
   scrollbar-width: none; /* Firefox */
 }
 
+/* Disable native scroll snapping on mobile to prevent Chrome address bar jump */
+@media (hover: none) and (pointer: coarse) {
+  .scroll-container {
+    scroll-snap-type: none;
+  }
+}
+
 .scroll-container::-webkit-scrollbar {
   display: none; /* Chrome, Safari and Opera */
 }
