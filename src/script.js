@@ -1,20 +1,16 @@
 import { PROJECTS, WORKED_FOR_BRANDS } from './data.js';
 
-// Calculate and set --vh for mobile viewport fix
-function setViewportProperty() {
-  let vh = window.innerHeight * 0.01;
-  document.documentElement.style.setProperty('--vh', `${vh}px`);
-}
-
-// Initial set
-setViewportProperty();
-
-// Only recalculate if the width changes to avoid jumping when mobile URL bar hides/shows on scroll
-let windowWidth = window.innerWidth;
+// Temporarily disable scroll snapping on resize to prevent mobile browser jumping
+// when the address bar hides/shows and 100dvh resizes the sections.
+let snapTimeout;
 window.addEventListener('resize', () => {
-  if (window.innerWidth !== windowWidth) {
-    windowWidth = window.innerWidth;
-    setViewportProperty();
+  const container = document.getElementById('scroll-container');
+  if (container) {
+    container.style.scrollSnapType = 'none';
+    clearTimeout(snapTimeout);
+    snapTimeout = setTimeout(() => {
+      container.style.scrollSnapType = '';
+    }, 150);
   }
 });
 

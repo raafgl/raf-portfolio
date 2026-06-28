@@ -24,14 +24,12 @@ body {
   overflow: hidden;
   height: 100vh;
   height: 100dvh;
-  height: calc(var(--vh, 1vh) * 100);
 }
 
 /* Scroll Snap custom utilities */
 .scroll-container {
   height: 100vh;
   height: 100dvh;
-  height: calc(var(--vh, 1vh) * 100);
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
@@ -46,7 +44,6 @@ body {
 .scroll-section {
   height: 100vh;
   height: 100dvh;
-  height: calc(var(--vh, 1vh) * 100);
   width: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
@@ -207,7 +204,6 @@ footer.fixed {
 .fixed.right-0.top-0 {
   height: 100vh !important;
   height: 100dvh !important;
-  height: calc(var(--vh, 1vh) * 100) !important;
 }
 
 /* Mobile-specific layout rebalancing and safe constraints */
